@@ -108,9 +108,9 @@
                     <div class="page-title">
                         <h1>{l s='My wishlist' mod='blockwishlist'}</h1>
 
-                        <p class="wishlisturl pull-right">Permalink : <input type="text"
-                                                                             value="{$base_dir_ssl}modules/blockwishlist/view.php?token={$token|escape:'htmlall':'UTF-8'}"
-                                                                             readonly="readonly"/></p>
+                        {*<p class="wishlisturl pull-right">Permalink : <input type="text"*}
+                                                                             {*value="{$base_dir_ssl}modules/blockwishlist/view.php?token={$token|escape:'htmlall':'UTF-8'}"*}
+                                                                             {*readonly="readonly"/></p>*}
                     </div>
                     <div class="list-wishlist products-list">
 

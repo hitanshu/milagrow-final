@@ -26,10 +26,8 @@
 
 if (!defined('_PS_VERSION_'))
     exit;
-
-//require("integral_evolution/libFunctions.php");
-define('_MERCHANT_ID', 'M_milagrow_6881');
-define('_BILLING_PAGE_HEADING', 'Milagrow HumanTech EMI');
+require 'emiLibFunctions.php';
+define('_CCAVENUE_EMI_SUCCESS', 'Thank you placing the order, %s of amount Rs. %s. Your order is being processed. Please check your email for additional details.');
 class EMI extends PaymentModule
 {
     public function __construct()
@@ -38,7 +36,7 @@ class EMI extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '1.0';
         $this->author = 'GAPS';
-        $this->need_instance = 1;
+        $this->need_instance = 0;
 
         $this->currencies = true;
         $this->currencies_mode = 'radio';
@@ -61,13 +59,35 @@ class EMI extends PaymentModule
         if (!parent::install() OR !$this->registerHook('payment') OR !$this->registerHook('paymentReturn'))
             return false;
         Configuration::updateValue('_MERCHANT_ID_EMI_CCAVENUE_3', 'M_vij43235_43235');
-        Configuration::updateValue('_MERCHANT_ID_EMI_CCAVENUE_3', 'M_vij43235_43235');
+        Configuration::updateValue('CCAVENUE_EMI_PENDING_STATUS', $this->_addState());
+        Configuration::updateValue('_MERCHANT_ID_EMI_CCAVENUE_6', 'M_vij43236_43236');
         Configuration::updateValue('WORKING_KEY_EMI_3_MONTHS', 'f6srdljv9krmyof389tjdixf86bgmc55');
         Configuration::updateValue('WORKING_KEY_EMI_6_MONTHS', 'f6srdljv9krmyof389tjdixf86bgmc55');
-        Configuration::updateValue('EMI_CCAVENUE_3_MONTHS_TAX', 16);
-        Configuration::updateValue('EMI_CCAVENUE_6_MONTHS_TAX', 14);
+        Configuration::updateValue('EMI_CCAVENUE_3_MONTHS_TAX', 2);
+        Configuration::updateValue('EMI_CCAVENUE_6_MONTHS_TAX', 4);
         return true;
     }
+
+    /******************************************************************/
+    /** Add payment state: EMI: Payment Pending ******************/
+    /** For order that are still in pending verification **************/
+    /******************************************************************/
+    private function _addState()
+    {
+        $orderState = new OrderState();
+        $orderState->name = array();
+        foreach (Language::getLanguages() as $language)
+            $orderState->name[$language['id_lang']] = $this->l('EMI: Payment Pending');
+        $orderState->send_email = false;
+        $orderState->color = '#DDEEFF';
+        $orderState->hidden = false;
+        $orderState->delivery = false;
+        $orderState->logable = true;
+        if ($orderState->add())
+            copy(dirname(__FILE__) . '/logo.gif', dirname(__FILE__) . '/../../img/os/' . (int)$orderState->id . '.gif');
+        return $orderState->id;
+    }
+
 
     public function hookPayment($params)
     {
@@ -85,7 +105,7 @@ class EMI extends PaymentModule
         $orderTotal = $context->cart->getOrderTotal();
 
 
-        if ($orderTotal >= 4000) {
+        if ($orderTotal >= 5000) {
             $smarty->assign(array(
                 'this_path' => $this->_path,
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
@@ -99,109 +119,348 @@ class EMI extends PaymentModule
 
     }
 
+    /* Called when an order was placed and CCAvenue is keeping us posted about the payment validation */
+    public function validation()
+    {
+        $context = context::getContext();
+        $card_expiration = '';
+        $card_holder = '';
+        $MerchantId = isset($_REQUEST["Merchant_Id"]) ? $_REQUEST["Merchant_Id"] : '';
+        $OrderId = isset($_REQUEST["Order_Id"]) ? $_REQUEST["Order_Id"] : '';
+        $Amount = isset($_REQUEST["Amount"]) ? $_REQUEST["Amount"] : '';
+        $AuthDesc = isset($_REQUEST["AuthDesc"]) ? $_REQUEST["AuthDesc"] : '';
+        $avnChecksum = isset($_REQUEST["Checksum"]) ? $_REQUEST["Checksum"] : '';
+        $nb_order_no = isset($_REQUEST["nb_order_no"]) ? $_REQUEST['nb_order_no'] : '';
+
+        //as we are not getting card number from ccavenue we are using this field for storing whether emi 3 months used or 6 months used
+        $card_number = isset($_REQUEST["Merchant_Param"]) ? $_REQUEST["Merchant_Param"] : '';
+        //and card holder is used to store percentage of EMI processing fee
+        if ($card_number == '3_months') {
+            $card_holder = Configuration::get('EMI_CCAVENUE_3_MONTHS_TAX');
+            $workingKey = Configuration::get('WORKING_KEY_EMI_3_MONTHS');
+            $merchantIdUsed = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_3');
+            $context->cookie->emi = $this->getEMIAmount($this->context->cart->getOrderTotal(true, Cart::BOTH), $Amount);
+        } elseif ($card_number == '6_months') {
+            $card_holder = Configuration::get('EMI_CCAVENUE_6_MONTHS_TAX');
+            $merchantIdUsed = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_6');
+            $workingKey = Configuration::get('WORKING_KEY_EMI_6_MONTHS');
+            $context->cookie->emi = $this->getEMIAmount($this->context->cart->getOrderTotal(true, Cart::BOTH), $Amount);
+        }
+        $Checksum = verifyChecksumEMI($merchantIdUsed, $OrderId, $Amount, $AuthDesc, $workingKey, $avnChecksum);
+        $billing_cust_name = isset($_REQUEST["billing_cust_name"]) ? $_REQUEST["billing_cust_name"] : '';
+        $billing_cust_address = isset($_REQUEST["billing_cust_address"]) ? $_REQUEST["billing_cust_address"] : '';
+        $billing_cust_state = isset($_REQUEST["billing_cust_state"]) ? $_REQUEST["billing_cust_state"] : '';
+        $billing_cust_city = isset($_REQUEST["billing_cust_city"]) ? $_REQUEST["billing_cust_city"] : '';
+        $billing_zip_code = isset($_REQUEST["billing_zip_code"]) ? $_REQUEST["billing_zip_code"] : '';
+        $billing_cust_country = isset($_REQUEST["billing_cust_country"]) ? $_REQUEST["billing_cust_country"] : '';
+        $billing_cust_tel = isset($_REQUEST["billing_cust_tel"]) ? $_REQUEST['billing_cust_tel'] : '';
+        $billing_cust_email = isset($_REQUEST["billing_cust_email"]) ? $_REQUEST["billing_cust_email"] : '';
+
+        $card_category = isset($_REQUEST["card_category"]) ? $_REQUEST["card_category"] : '';
+        $cart_id = (int)str_replace('EMI_', '', $OrderId);
+        $cart = new Cart($cart_id);
+        $extraVars = array('transaction_id' => $nb_order_no);
+        $this->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_PAYMENT'), (float)$Amount, 'EMI', 'Your credit card has been charged and the transaction is successful', $extraVars, null, false, $cart->secure_key);
+
+        //finding order for EMI
+        $orders = $this->getAllOrdersForGivenCart((int)$cart->id);
+        $orderWiseAdvancePaymentMapping = array();
+        $orderWiseAmount = $this->getEMIPaymentAmountOrderWise($orders, $card_holder);
+        $existing_id_currency = 1;
+        $existing_conversion_rate = 1.000000;
+        if (!empty($orders)) {
+            $orderReference = $orders[0]['reference'];
+        }
+        foreach ($orders as $key => $singleOrder) {
+            $EMIPayment = $orderWiseAmount[$singleOrder['id_order']];
+            Db::getInstance()->insert('order_payment', array(
+                'id_currency' => (int)$existing_id_currency,
+                'amount' => $EMIPayment,
+                'payment_method' => pSQL('EMI'),
+                'conversion_rate' => $existing_conversion_rate,
+                'transaction_id' => $nb_order_no,
+                'card_number' => $card_number,
+                'card_brand' => $card_category,
+                'card_expiration' => $card_expiration,
+                'card_holder' => $card_holder,
+                'date_add' => date('Y-m-d H:i:s'),
+                'order_reference' => $orderReference
+            ));
+            $last_insert_payment_id = Db::getInstance()->insert_id();
+            Db::getInstance()->insert('order_invoice_payment', array(
+                'id_order_invoice' => (int)$singleOrder['invoice_number'],
+                'id_order_payment' => (int)($last_insert_payment_id),
+                'id_order' => (int)($singleOrder['id_order']),
+            ));
+            $orderWiseAdvancePaymentMapping[] = array('amount' => $EMIPayment, 'orderId' => $singleOrder['id_order'], 'reference' => $singleOrder['reference'] . '#' . ($key + 1), 'id_address_delivery' => $singleOrder['id_address_delivery']);
+        }
+
+        //removing EMI Amount from cookie
+        $context->cookie->emi = null;
+        $billingAddress = array('firstname' => $billing_cust_name, 'lastname' => '', 'state' => $billing_cust_state, 'phone' => $billing_cust_tel, 'postcode' => $billing_zip_code, 'city' => $billing_cust_city, 'address1' => $billing_cust_address, 'address2' => '', 'country' => $billing_cust_country);
+        if (!empty($billing_cust_tel)) {
+            //sending SMS to customer for successful payment received
+            $this->sendMessage($orderReference, $Amount, $billing_cust_tel);
+        }
+        foreach ($orderWiseAdvancePaymentMapping as $orderEntry) {
+            $this->sendEmailToCustomer($billingAddress, $orderEntry['reference'], $orderEntry['orderId'], $card_number, $card_holder);
+        }
+
+
+    }
+
     public static function getShopDomainSsl($http = false, $entities = false)
     {
         if (method_exists('Tools', 'getShopDomainSsl'))
             return Tools::getShopDomainSsl($http, $entities);
     }
 
-    public function hookpaymentReturn($params)
+
+    public function getAllOrdersForGivenCart($cartId)
     {
-        if (!$this->active)
-            return;
-        global $smarty;
-        //get customer delivery address and name by querying
-        $id_address_delivery = $params['cart']->id_address_delivery;
-        $id_address_invoice = $params['cart']->id_address_invoice;
-        $Redirect_Url = Tools::getShopDomainSsl(true, true) . '/index.php?fc=module&module=' . $this->name . '&controller=paymentnotification'; //your redirect URL where your customer will be redirected after authorisation from CCAvenue
-        if ($id_address_delivery == $id_address_invoice) {
-            $sql = 'SELECT ' . _DB_PREFIX_ . 'address.firstname,' . _DB_PREFIX_ . 'address.lastname,address1,address2,city,postcode,phone,email,' . _DB_PREFIX_ . 'country_lang.name as country,' . _DB_PREFIX_ . 'state.name as state FROM ' . _DB_PREFIX_ . 'address join ' . _DB_PREFIX_ . 'country_lang on ' . _DB_PREFIX_ . 'country_lang.id_country=' . _DB_PREFIX_ . 'address.id_country Join ' . _DB_PREFIX_ . 'state on ' . _DB_PREFIX_ . 'address.id_state=' . _DB_PREFIX_ . 'state.id_state join ' . _DB_PREFIX_ . 'customer on ' . _DB_PREFIX_ . 'customer.id_customer=' . _DB_PREFIX_ . 'address.id_customer WHERE id_address =' . $id_address_invoice;
-            if ($row = Db::getInstance()->getRow($sql)) {
-                $billing_cust_name = $row['firstname'] . '' . $row['lastname'];
-                $billing_cust_address = $row['address1'] . '' . $row['address2'];
-                $billing_cust_country = $row['country'];
-                $billing_cust_state = $row['state'];
-                $billing_city = $row['city'];
-                $billing_zip = $row['postcode'];
-                $billing_cust_tel = $row['phone'];
-                $billing_cust_email = $row['email'];
+        $sqlQuery = 'Select * from ' . _DB_PREFIX_ . 'orders where id_cart=' . $cartId;
+        $result = Db::getInstance()->executeS($sqlQuery);
+        if ($result)
+            return $result;
+        return array();
+    }
 
-                $delivery_cust_name = $billing_cust_name;
-                $delivery_cust_address = $billing_cust_address;
-                $delivery_cust_country = $billing_cust_country;
-                $delivery_cust_state = $billing_cust_state;
-                $delivery_city = $billing_city;
-                $delivery_zip = $billing_zip;
-                $delivery_cust_tel = $billing_cust_tel;
-                $delivery_cust_email = $billing_cust_email;
-                $delivery_cust_notes = "Down Payment";
-                $billingPageHeading = _BILLING_PAGE_HEADING;
-            }
-        } else {
-            $sql = 'SELECT ' . _DB_PREFIX_ . 'address.firstname' . _DB_PREFIX_ . 'address.lastname,address1,address2,city,postcode,phone,email,' . _DB_PREFIX_ . 'country_lang.name as country,' . _DB_PREFIX_ . 'state.name as state FROM ' . _DB_PREFIX_ . 'address join ' . _DB_PREFIX_ . 'country_lang on ' . _DB_PREFIX_ . 'country_lang.id_country=' . _DB_PREFIX_ . 'address.id_country Join ' . _DB_PREFIX_ . 'state on ' . _DB_PREFIX_ . 'address.id_state=' . _DB_PREFIX_ . 'state.id_state join ' . _DB_PREFIX_ . 'customer on ' . _DB_PREFIX_ . 'customer.id_customer=' . _DB_PREFIX_ . 'address.id_customer where id_address in(' . "'$id_address_invoice'," . "'$id_address_delivery'";
+    private function getEMIAmount($cartTotal, $amountPaid)
+    {
+        return ($amountPaid - $cartTotal);
+    }
 
 
-            if ($results = Db::getInstance()->ExecuteS($sql))
-                foreach ($results as $row) {
-                    if ($row['addressId'] == $id_address_delivery) {
-                        $delivery_cust_name = $row['firstname'] . '' . $row['lastname'];
-                        $delivery_cust_address = $row['address1'] . '' . $row['address2'];
-                        $delivery_cust_country = $row['country'];
-                        $delivery_cust_state = $row['state'];
-                        $delivery_city = $row['city'];
-                        $delivery_zip = $row['postcode'];
-                        $delivery_cust_tel = $row['phone'];
-                        $delivery_cust_email = $row['email'];
-                    }
-                    if ($row['addressId'] == $id_address_invoice) {
-                        $billing_cust_name = $row['firstname'] . '' . $row['lastname'];
-                        $billing_cust_address = $row['address1'] . '' . $row['address2'];
-                        $billing_cust_country = $row['country'];
-                        $billing_cust_state = $row['state'];
-                        $billing_city = $row['city'];
-                        $billing_zip = $row['postcode'];
-                        $billing_cust_tel = $row['phone'];
-                        $billing_cust_email = $row['email'];
-                    }
-                    $billingPageHeading = _BILLING_PAGE_HEADING;
-                    $delivery_cust_notes = "EMI PAYMENT";
+    private function getEMIPaymentAmountOrderWise($orders, $EMIRate)
+    {
+        $EMIPaymentKeyValue = array();
+        foreach ($orders as $orderEntry) {
+            $emiProcesingFee = ($EMIRate * $orderEntry['total_paid'] / 100);
+            $serviceTax = (12.36 * $emiProcesingFee / 100);
+            $EMIAmountPaid = $orderEntry['total_paid'] + $emiProcesingFee + $serviceTax;
+            $EMIPaymentKeyValue[$orderEntry['id_order']] = $EMIAmountPaid;
+        }
+
+        return $EMIPaymentKeyValue;
+
+    }
+
+
+    function sendMessage($orderReference, $amount, $mobile)
+    {
+        try {
+            $message = sprintf(_CCAVENUE_COD_SUCCESS, $orderReference, $amount);
+
+            $username = _SMS_USERNAME;
+            $password = _SMS_PASSWORD;
+            //create api url to hit
+            $sms_url = _SMS_URL;
+            $senderId = _SMS_SENDERID;
+            $sms_url = "$sms_url?username=$username&password=$password&sendername=$senderId&mobileno=$mobile&message=" . urlencode($message);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $sms_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, '6');
+            $result = curl_exec($ch);
+            $error = curl_error($ch);
+            $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+        } catch (Exception $e) {
+            //consuming exception
+        }
+
+    }
+
+    private
+    function sendEmailToCustomer($billingAddress, $orderReference, $orderId, $EMIRate, $EMIPlan)
+    {
+        $order = new Order($orderId);
+        $products_list = '';
+        $virtual_product = true;
+        //finding products for particular cart
+        $productsSql = 'Select ' . _DB_PREFIX_ . 'cart_product.id_product as id_product,' . _DB_PREFIX_ . 'cart_product.id_product_attribute as id_product_attribute,' . _DB_PREFIX_ . 'cart_product.quantity as cart_quantity,' . _DB_PREFIX_ . 'product.reference as reference,'
+            . _DB_PREFIX_ . 'product_lang.name as name from ' . _DB_PREFIX_ . 'cart_product join '
+            . _DB_PREFIX_ . 'orders on ' . _DB_PREFIX_ . 'cart_product.id_cart=' . _DB_PREFIX_ . 'orders.id_cart join '
+            . _DB_PREFIX_ . 'product on ' . _DB_PREFIX_ . 'cart_product.id_product=' . _DB_PREFIX_ . 'product.id_product join '
+            . _DB_PREFIX_ . 'product_lang on ' . _DB_PREFIX_ . 'product.id_product=' . _DB_PREFIX_ . 'product_lang.id_product where id_order=' . $orderId;
+        $products = Db::getInstance()->ExecuteS($productsSql);
+        foreach ($products as $key => $product) {
+            $price = Product::getPriceStatic((int)$product['id_product'], false, ($product['id_product_attribute'] ? (int)$product['id_product_attribute'] : null), 6, null, false, true, $product['cart_quantity'], false, (int)$order->id_customer, (int)$order->id_cart, (int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+            $price_wt = Product::getPriceStatic((int)$product['id_product'], true, ($product['id_product_attribute'] ? (int)$product['id_product_attribute'] : null), 2, null, false, true, $product['cart_quantity'], false, (int)$order->id_customer, (int)$order->id_cart, (int)$order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+
+            $customization_quantity = 0;
+            $customized_datas = Product::getAllCustomizedDatas((int)$order->id_cart);
+            if (isset($customized_datas[$product['id_product']][$product['id_product_attribute']])) {
+                $customization_text = '';
+                foreach ($customized_datas[$product['id_product']][$product['id_product_attribute']][$order->id_address_delivery] as $customization) {
+                    if (isset($customization['datas'][Product::CUSTOMIZE_TEXTFIELD]))
+                        foreach ($customization['datas'][Product::CUSTOMIZE_TEXTFIELD] as $text)
+                            $customization_text .= $text['name'] . ': ' . $text['value'] . '<br />';
+
+                    if (isset($customization['datas'][Product::CUSTOMIZE_FILE]))
+                        $customization_text .= sprintf(Tools::displayError('%d image(s)'), count($customization['datas'][Product::CUSTOMIZE_FILE])) . '<br />';
+                    $customization_text .= '---<br />';
                 }
+                $customization_text = rtrim($customization_text, '---<br />');
+
+                $customization_quantity = (int)$product['customization_quantity'];
+                $products_list .=
+                    '<tr style="background-color: ' . ($key % 2 ? '#DDE2E6' : '#EBECEE') . ';">
+								<td style="padding: 0.6em 0.4em;width: 15%;">' . $product['reference'] . '</td>
+								<td style="padding: 0.6em 0.4em;width: 30%;"><strong>' . $product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : '') . ' - ' . Tools::displayError('Customized') . (!empty($customization_text) ? ' - ' . $customization_text : '') . '</strong></td>
+								<td style="padding: 0.6em 0.4em; width: 20%;">' . Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, 2) : $price_wt, $this->context->currency, false) . '</td>
+								<td style="padding: 0.6em 0.4em; width: 15%;">' . $customization_quantity . '</td>
+								<td style="padding: 0.6em 0.4em; width: 20%;">' . Tools::displayPrice($customization_quantity * (Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, 2) : $price_wt), $this->context->currency, false) . '</td>
+							</tr>';
+            }
+
+            if (!$customization_quantity || (int)$product['cart_quantity'] > $customization_quantity)
+                $products_list .=
+                    '<tr style="background-color: ' . ($key % 2 ? '#DDE2E6' : '#EBECEE') . ';">
+								<td style="padding: 0.6em 0.4em;width: 15%;">' . $product['reference'] . '</td>
+								<td style="padding: 0.6em 0.4em;width: 30%;"><strong>' . $product['name'] . (isset($product['attributes']) ? ' - ' . $product['attributes'] : '') . '</strong></td>
+								<td style="padding: 0.6em 0.4em; width: 20%;">' . Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, 2) : $price_wt, $this->context->currency, false) . '</td>
+								<td style="padding: 0.6em 0.4em; width: 15%;">' . ((int)$product['cart_quantity'] - $customization_quantity) . '</td>
+								<td style="padding: 0.6em 0.4em; width: 20%;">' . Tools::displayPrice(((int)$product['cart_quantity'] - $customization_quantity) * (Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, 2) : $price_wt), $this->context->currency, false) . '</td>
+							</tr>';
+
+            // Check if is not a virutal product for the displaying of shipping
+            if (!$product['is_virtual'])
+                $virtual_product &= false;
+
+        }
+        $delivery = new Address($order->id_address_delivery);
+        $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
+
+
+        //computing parameters for
+
+        $totalOrderPrice = $order->total_paid;
+        $emiProcessingFees = ($EMIRate * $totalOrderPrice / 100);
+        $serviceTaxProcessingFees = ($emiProcessingFees * 12.36 / 100);
+        $totalOrderFinal = $totalOrderPrice + $emiProcessingFees + $serviceTaxProcessingFees;
+
+        if ($EMIPlan == '3_months')
+            $EMIPlan = '3 Months';
+        else
+            $EMIPlan = '6 Months';
+
+        $data = array(
+            '{firstname}' => $this->context->customer->firstname,
+            '{lastname}' => $this->context->customer->lastname,
+            '{email}' => $this->context->customer->email,
+            '{delivery_block_txt}' => $this->getFormattedDeliveryAddress($delivery, false),
+            '{invoice_block_txt}' => $this->getFormattedBillingAddress($billingAddress, false),
+            '{delivery_block_html}' => $this->getFormattedDeliveryAddress($delivery, true),
+            '{invoice_block_html}' => $this->getFormattedBillingAddress($billingAddress, true),
+            '{delivery_company}' => $delivery->company,
+            '{delivery_firstname}' => $delivery->firstname,
+            '{delivery_lastname}' => $delivery->lastname,
+            '{delivery_address1}' => $delivery->address1,
+            '{delivery_address2}' => $delivery->address2,
+            '{delivery_city}' => $delivery->city,
+            '{delivery_postal_code}' => $delivery->postcode,
+            '{delivery_country}' => $delivery->country,
+            '{delivery_state}' => $delivery->id_state ? $delivery_state->name : '',
+            '{delivery_phone}' => ($delivery->phone) ? $delivery->phone : $delivery->phone_mobile,
+            '{delivery_other}' => $delivery->other,
+            '{invoice_company}' => '',
+            '{invoice_vat_number}' => '',
+            '{invoice_firstname}' => $billingAddress['firstname'],
+            '{invoice_lastname}' => $billingAddress['lastname'],
+            '{invoice_address2}' => $billingAddress['address2'],
+            '{invoice_address1}' => $billingAddress['address1'],
+            '{invoice_city}' => $billingAddress['city'],
+            '{invoice_postal_code}' => $billingAddress['postcode'],
+            '{invoice_country}' => $billingAddress['country'],
+            '{invoice_state}' => $billingAddress['state'],
+            '{invoice_phone}' => $billingAddress['phone'],
+            '{invoice_other}' => '',
+            '{order_name}' => $orderReference,
+            '{date}' => Tools::displayDate(date('Y-m-d H:i:s'), (int)$order->id_lang, 1),
+            '{carrier}' => Tools::displayError('No carrier'),
+            '{payment}' => Tools::substr($order->payment, 0, 32),
+            '{products}' => $products_list,
+            '{discounts}' => '',
+            '{emi_tax_rate}' => $EMIRate,
+            '{emi_plan}' => $EMIPlan,
+            '{emi_processing_fees}' => $emiProcessingFees,
+            '{service_tax_fees}' => $serviceTaxProcessingFees,
+            '{total_final_paid}' => $totalOrderFinal,
+            '{total_paid}' => Tools::displayPrice($order->total_paid, $this->context->currency, false),
+            '{total_products}' => Tools::displayPrice($order->total_paid - $order->total_shipping - $order->total_wrapping + $order->total_discounts, $this->context->currency, false),
+            '{total_discounts}' => Tools::displayPrice($order->total_discounts, $this->context->currency, false),
+            '{total_shipping}' => Tools::displayPrice($order->total_shipping, $this->context->currency, false),
+            '{total_wrapping}' => Tools::displayPrice($order->total_wrapping, $this->context->currency, false));
+
+
+        // Join PDF invoice
+        if ((int)Configuration::get('PS_INVOICE') && $order->invoice_number) {
+            $pdf = new PDF($order->getInvoicesCollection(), PDF::TEMPLATE_INVOICE, $this->context->smarty);
+            $file_attachement['content'] = $pdf->render(false);
+            $file_attachement['name'] = Configuration::get('PS_INVOICE_PREFIX', (int)$order->id_lang, null, $order->id_shop) . sprintf('%06d', $order->invoice_number) . '.pdf';
+            $file_attachement['mime'] = 'application/pdf';
+        } else
+            $file_attachement = null;
+
+        if (Validate::isEmail($this->context->customer->email))
+            Mail::Send(
+                (int)$order->id_lang,
+                'order_conf',
+                Mail::l('Order confirmation', (int)$order->id_lang),
+                $data,
+                $this->context->customer->email,
+                $this->context->customer->firstname . ' ' . $this->context->customer->lastname,
+                null,
+                null,
+                $file_attachement,
+                null, getcwd(), false, (int)$order->id_shop
+            );
+
+        // updates stock in shops
+        if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
+            $product_list = $order->getProducts();
+            foreach ($product_list as $product) {
+                // if the available quantities depends on the physical stock
+                if (StockAvailable::dependsOnStock($product['product_id'])) {
+                    // synchronizes
+                    StockAvailable::synchronize($product['product_id'], $order->id_shop);
+                }
+
+
+            }
+        }
+
+    }
+
+    private
+    function getFormattedDeliveryAddress($address, $html = true)
+    {
+        if ($html) {
+            return '<strong>' . $address->firstname . '' . $address->lastname . '</strong><br/>' . $address->address1 .
+                '<br>' . $address->address2 . '<br>' . $address->city . ',' . $address->state . '<br>' . $address->country . '<br>' . $address->postcode;
 
         }
 
-        $Merchant_Id = _MERCHANT_ID; //This id(also User_Id)  available at "Generate Working Key" of "Settings & Options"
-        $Order_Id = $params['objOrder']->reference; //your script should substitute the order description here in the quotes provided here
-        $Amount = _DOWN_PAYMENT_AMOUNT; //your script should substitute the amount here in the quotes provided here
-        $WorkingKey = "f6srdljv9krmyof389tjdixf86bgmc55"; //put in the 32 bit alphanumeric key in the quotes provided here.Please note that get this key login to your
-
-        $Checksum = getChecksum($Merchant_Id, $Order_Id, $Amount, $Redirect_Url, $WorkingKey);
-
-        $smarty->assign(array(
-            'Merchant_id' => _MERCHANT_ID,
-            'amount' => _DOWN_PAYMENT_AMOUNT,
-            'redirectLink' => $Redirect_Url,
-            'Order_Id' => $params['objOrder']->reference,
-            'delivery_cust_name' => $delivery_cust_name,
-            'delivery_cust_address' => $delivery_cust_address,
-            'delivery_cust_country' => $delivery_cust_country,
-            'delivery_cust_state' => $delivery_cust_state,
-            'delivery_city' => $delivery_city,
-            'delivery_zip' => $delivery_zip,
-            'delivery_cust_tel' => $delivery_cust_tel,
-            'delivery_cust_email' => $delivery_cust_email,
-            'billing_cust_name' => $billing_cust_name,
-            'billing_cust_address' => $billing_cust_address,
-            'billing_cust_country' => $billing_cust_country,
-            'billing_cust_state' => $billing_cust_state,
-            'billing_city' => $billing_city,
-            'billing_zip' => $billing_zip,
-            'billing_cust_tel' => $billing_cust_tel,
-            'billing_cust_email' => $billing_cust_email,
-            'billingPageHeading' => $billingPageHeading,
-            'delivery_cust_notes' => $delivery_cust_notes,
-            'checksum' => $Checksum,
-        ));
-
-        return $this->display(__FILE__, 'confirmation.tpl');
+        return $address->firstname . ' ' . $address->lastname . '\r\n' . $address->address1 .
+            '\r\n' . $address->address2 . '\r\n' . $address->city . ',' . $address->state . '\r\n' . $address->country . '\r\n' . $address->postcode;
     }
+
+    private
+    function getFormattedBillingAddress($address, $html = true)
+    {
+
+        if ($html) {
+            return '<strong>' . $address['firstname'] . '' . $address['lastname'] . '</strong><br/>' . $address['address1'] .
+                '<br>' . $address['address2'] . '<br>' . $address['city'] . ',' . $address['state'] . '<br>' . $address['country'] . '<br>' . $address['postcode'];
+
+        }
+
+        return $address['firstname'] . ' ' . $address['lastname'] . '\r\n' . $address['address1'] .
+            '\r\n' . $address['address2'] . '\r\n' . $address['city'] . ',' . $address['state'] . '\r\n' . $address['country'] . '\r\n' . $address['postcode'];
+    }
+
+
 }

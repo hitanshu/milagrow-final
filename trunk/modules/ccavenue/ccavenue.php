@@ -189,17 +189,17 @@ class CCAvenue extends PaymentModule
         $amount = $_REQUEST['Amount'];
         $cart_id = (int)str_replace('ccAvenue_', '', $_REQUEST['Order_Id']);
         $auth_desc = $_REQUEST['AuthDesc'];
-
+        $extra_vars = array();
         $cart = new Cart($cart_id);
-
         if ($_REQUEST['Merchant_Id'] == Configuration::get('CCAVENUE_MERCHANT_ID')) {
             $verifCheckSum = $this->_adler32(Configuration::get('CCAVENUE_MERCHANT_ID') . '|ccAvenue_' . $cart_id . '|' . $amount . '|' . $auth_desc . '|' . Configuration::get('CCAVENUE_WORKING_KEY')) == $_REQUEST['Checksum'] ? true : false;
             if ($verifCheckSum) {
+                $extra_vars['transaction_id'] = $_REQUEST['nb_order_no'];
                 if ($auth_desc == 'Y')
-                    $this->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_PAYMENT'), (float)$amount, $this->displayName, $this->l('Your credit card has been charged and the transaction is successful'), array(), null, false, $cart->secure_key);
+                    $this->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_PAYMENT'), (float)$amount, $this->displayName, $this->l('Your credit card has been charged and the transaction is successful'), $extra_vars, null, false, $cart->secure_key);
                 elseif ($auth_desc == 'B')
-                    $this->validateOrder((int)$cart->id, (int)Configuration::get('CCAVENUE_PENDING_STATUS'), (float)$amount, $this->displayName, $this->l('The transaction is in pending verification'), array(), null, false, $cart->secure_key); elseif ($auth_desc == 'N')
-                    $this->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_ERROR'), (float)$amount, $this->displayName, $this->l('The transaction has been declined'), array(), null, false, $cart->secure_key);
+                    $this->validateOrder((int)$cart->id, (int)Configuration::get('CCAVENUE_PENDING_STATUS'), (float)$amount, $this->displayName, $this->l('The transaction is in pending verification'), $extra_vars, null, false, $cart->secure_key); elseif ($auth_desc == 'N')
+                    $this->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_ERROR'), (float)$amount, $this->displayName, $this->l('The transaction has been declined'), $extra_vars, null, false, $cart->secure_key);
                 if (version_compare(_PS_VERSION_, '1.5', '<'))
                     $redirect = __PS_BASE_URI__ . 'order-confirmation.php?id_cart=' . (int)$cart->id . '&id_module=' . (int)$this->id . '&id_order=' . (int)$this->currentOrder . '&key=' . $cart->secure_key;
                 else

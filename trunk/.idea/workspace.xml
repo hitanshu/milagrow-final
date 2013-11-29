@@ -2,29 +2,74 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/trunk.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/log/.htaccess" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/log/20130606_exception.log" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/log/20130823_exception.log" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/log/20131012_exception.log" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/log/20131114_exception.log" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classes/log/AbstractLogger.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classes/log/FileLogger.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classes/log/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/log/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/override/classes/log/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/trunk.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/modules/ccavenue/img/logo.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/ccavutil.jar" afterPath="$PROJECT_DIR$/modules/cod/ccavutil.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/integral_evolution/ccavutil.jar" afterPath="$PROJECT_DIR$/modules/cod/integral_evolution/ccavutil.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/cod.gif" afterPath="$PROJECT_DIR$/modules/cod/cod.gif" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/cod.jpg" afterPath="$PROJECT_DIR$/modules/cod/cod.jpg" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/hook/confirmation.tpl.bk" afterPath="$PROJECT_DIR$/modules/cod/views/templates/hook/confirmation.tpl.bk" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/emi.gif" afterPath="$PROJECT_DIR$/modules/emi/emi.gif" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/emi.jpg" afterPath="$PROJECT_DIR$/modules/emi/emi.jpg" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ccavenue/img/logo-old.png" afterPath="$PROJECT_DIR$/modules/ccavenue/img/logo-old.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/logo.gif" afterPath="$PROJECT_DIR$/modules/cod/logo.gif" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ccavenue/img/logo.jpg" afterPath="$PROJECT_DIR$/modules/ccavenue/img/logo.jpg" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/logo.png" afterPath="$PROJECT_DIR$/modules/cod/logo.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/hook/payment.tpl.bk" afterPath="$PROJECT_DIR$/modules/cod/views/templates/hook/payment.tpl.bk" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/override/classes/PaymentModule.php" afterPath="$PROJECT_DIR$/modules/cod/override/classes/PaymentModule.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/override/classes/PaymentModule.php" afterPath="$PROJECT_DIR$/override/classes/PaymentModule.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/blockwishlist/cart.php" afterPath="$PROJECT_DIR$/modules/blockwishlist/cart.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ccavenue/ccavenue.php" afterPath="$PROJECT_DIR$/modules/ccavenue/ccavenue.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/cod.php" afterPath="$PROJECT_DIR$/modules/cod/cod.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/config.xml" afterPath="$PROJECT_DIR$/modules/cod/config.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/hook/confirmation.tpl" afterPath="$PROJECT_DIR$/modules/cod/views/templates/hook/confirmation.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/emi.php" afterPath="$PROJECT_DIR$/modules/emi/emi.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/front/error.tpl" afterPath="$PROJECT_DIR$/modules/cod/views/templates/front/error.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/frontorder/frontorder.tpl" afterPath="$PROJECT_DIR$/modules/frontorder/frontorder.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/front/illegal_access.tpl" afterPath="$PROJECT_DIR$/modules/cod/views/templates/front/illegal_access.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ccavenue/backward_compatibility/index.php" afterPath="$PROJECT_DIR$/modules/ccavenue/backward_compatibility/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/index.php" afterPath="$PROJECT_DIR$/modules/cod/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/controllers/index.php" afterPath="$PROJECT_DIR$/modules/cod/controllers/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/controllers/front/index.php" afterPath="$PROJECT_DIR$/modules/cod/controllers/front/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/translations/index.php" afterPath="$PROJECT_DIR$/modules/cod/translations/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/index.php" afterPath="$PROJECT_DIR$/modules/cod/views/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/index.php" afterPath="$PROJECT_DIR$/modules/cod/views/templates/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/front/index.php" afterPath="$PROJECT_DIR$/modules/cod/views/templates/front/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/hook/index.php" afterPath="$PROJECT_DIR$/modules/cod/views/templates/hook/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/themes/greenapple-metrofas/pdf/invoice.tpl" afterPath="$PROJECT_DIR$/themes/greenapple-metrofas/pdf/invoice.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/integral_evolution/libFunctions.php" afterPath="$PROJECT_DIR$/modules/cod/integral_evolution/libFunctions.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/controllers/front/libFunctions.php" afterPath="$PROJECT_DIR$/modules/emi/controllers/front/libFunctions.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/themes/greenapple-metrofas/modules/blockwishlist/mywishlist.tpl" afterPath="$PROJECT_DIR$/themes/greenapple-metrofas/modules/blockwishlist/mywishlist.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/themes/greenapple-metrofas/js/order-address.js" afterPath="$PROJECT_DIR$/themes/greenapple-metrofas/js/order-address.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/en/order_conf.html" afterPath="$PROJECT_DIR$/modules/cod/en/order_conf.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/en/order_conf.html" afterPath="$PROJECT_DIR$/modules/emi/en/order_conf.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/en/order_conf.txt" afterPath="$PROJECT_DIR$/modules/cod/en/order_conf.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/en/order_conf_admin.html" afterPath="$PROJECT_DIR$/modules/cod/en/order_conf_admin.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/en/order_conf_admin.txt" afterPath="$PROJECT_DIR$/modules/cod/en/order_conf_admin.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ccavenue/tpl/payment-backup.tpl" afterPath="$PROJECT_DIR$/modules/ccavenue/tpl/payment-backup.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/views/templates/hook/payment-disabled.tpl" afterPath="$PROJECT_DIR$/modules/emi/views/templates/hook/payment-disabled.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ccavenue/tpl/payment.tpl" afterPath="$PROJECT_DIR$/modules/ccavenue/tpl/payment.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/hook/payment.tpl" afterPath="$PROJECT_DIR$/modules/cod/views/templates/hook/payment.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/controllers/front/paymentnotification.php" afterPath="$PROJECT_DIR$/modules/cod/controllers/front/paymentnotification.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/controllers/front/paymentnotification.php" afterPath="$PROJECT_DIR$/modules/emi/controllers/front/paymentnotification.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/integral_evolution/submit.php" afterPath="$PROJECT_DIR$/modules/cod/integral_evolution/submit.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/front/success.tpl" afterPath="$PROJECT_DIR$/modules/cod/views/templates/front/success.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/controllers/front/validation.php" afterPath="$PROJECT_DIR$/modules/cod/controllers/front/validation.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/controllers/front/validation.php" afterPath="$PROJECT_DIR$/modules/emi/controllers/front/validation.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/front/validation.tpl" afterPath="$PROJECT_DIR$/modules/cod/views/templates/front/validation.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/emi/views/templates/front/validation.tpl" afterPath="$PROJECT_DIR$/modules/emi/views/templates/front/validation.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/cod/views/templates/front/validationtpl.txt" afterPath="$PROJECT_DIR$/modules/cod/views/templates/front/validationtpl.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="trunk.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" time="1385701232321" ignored="false" />
-    <file path="/.gitignore" changelist="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" time="1385701596695" ignored="false" />
+    <file path="/.gitignore" changelist="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" time="1385701656237" ignored="false" />
     <file path="$PROJECT_DIR$/../../aamod/themes/greenapple-metrofas/pdf/invoice.tpl" changelist="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" time="1385629036891" ignored="false" />
     <file path="/invoice.tpl" changelist="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" time="1385624931238" ignored="false" />
     <file path="$PROJECT_DIR$/../../aamod/modules/frontorder/frontorder.tpl" changelist="c34fe385-db4b-4045-b7d7-2dac3d6a0bee" time="1385630725082" ignored="false" />
@@ -78,10 +123,28 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="0" selection-start="90" selection-end="90" vertical-scroll-proportion="0.18417463">
+            <state line="10" column="7" selection-start="103" selection-end="103" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="payment-backup.tpl" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/modules/ccavenue/tpl/payment-backup.tpl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="payment.tpl" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/modules/ccavenue/tpl/payment.tpl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="89" selection-start="1058" selection-end="1058" vertical-scroll-proportion="0.33850494">
               <folding />
             </state>
           </provider>
@@ -164,6 +227,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="trunk" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="trunk" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modules" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -220,13 +297,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="24" width="1600" height="876" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25933075" sideWeight="0.67193675" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25933075" sideWeight="0.67193675" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -303,16 +380,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cache/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="11" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/themes/greenapple/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="11" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/themes/metrofas/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
@@ -384,7 +451,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="0" selection-start="90" selection-end="90" vertical-scroll-proportion="0.18417463">
+        <state line="10" column="7" selection-start="103" selection-end="103" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/ccavenue/tpl/payment-backup.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/ccavenue/tpl/payment.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="89" selection-start="1058" selection-end="1058" vertical-scroll-proportion="0.33850494">
           <folding />
         </state>
       </provider>

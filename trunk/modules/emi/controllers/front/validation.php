@@ -32,35 +32,6 @@ class EMIValidationModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
 
-//	public function postProcess()
-//	{
-//		if ($this->context->cart->id_customer == 0 || $this->context->cart->id_address_delivery == 0 || $this->context->cart->id_address_invoice == 0 || !$this->module->active)
-//			Tools::redirectLink(__PS_BASE_URI__.'order.php?step=1');
-//
-//		// Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
-//		$authorized = false;
-//		foreach (Module::getPaymentModules() as $module)
-//			if ($module['name'] == 'emi')
-//			{
-//				$authorized = true;
-//				break;
-//			}
-//		if (!$authorized)
-//			die(Tools::displayError('This payment method is not available.'));
-//
-//		$customer = new Customer($this->context->cart->id_customer);
-//		if (!Validate::isLoadedObject($customer))
-//			Tools::redirectLink(__PS_BASE_URI__.'order.php?step=1');
-//
-//		if (Tools::getValue('confirm'))
-//		{
-//			$customer = new Customer((int)$this->context->cart->id_customer);
-//			$total = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-//			$this->module->validateOrder((int)$this->context->cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, null, array(), null, false, $customer->secure_key);
-//			Tools::redirectLink(__PS_BASE_URI__.'order-confirmation.php?key='.$customer->secure_key.'&id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->module->id.'&id_order='.(int)$this->module->currentOrder);
-//		}
-//	}
-
     /**
      * @see FrontController::initContent()
      */
@@ -69,13 +40,16 @@ class EMIValidationModuleFrontController extends ModuleFrontController
         parent::initContent();
 
 
+        //below logic change adding flat 2 % and 4% for 3 and 6 months respectively.
         $threemonthstaxperAnnum = Configuration::get('EMI_CCAVENUE_3_MONTHS_TAX');
-        $threeMonthsTax = ($threemonthstaxperAnnum / 12) * 3;
+//        $threeMonthsTax = ($threemonthstaxperAnnum / 12) * 3;
+        $threeMonthsTax = $threemonthstaxperAnnum; //using flat 2 % for EMI 3 months
         $sixmonthstaxperAnnum = Configuration::get('EMI_CCAVENUE_6_MONTHS_TAX');
-        $sixMonthsTax = ($sixmonthstaxperAnnum / 12) * 6;
+//        $sixMonthsTax = ($sixmonthstaxperAnnum / 12) * 6;
+        $sixMonthsTax = $sixmonthstaxperAnnum; //using flat 4 % for EMI 6 Months
         $serviceTax = 12.36;
         $orderTotal = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-        $Redirect_Url = Tools::getShopDomainSsl(true, true) . '/index.php?fc=module&module=emi&controller=paymentnotification'; //your redirect URL where your customer will be redirected after authorisation from CCAvenue
+        $Redirect_Url = 'http://' . htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8') . __PS_BASE_URI__ . 'modules/emi/validation.php'; //your redirect URL where your customer will be redirected after authorisation from CCAvenue
 
         //making details for 3 months EMI
         $merchantid3month = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_3');
@@ -83,19 +57,20 @@ class EMIValidationModuleFrontController extends ModuleFrontController
         $threeMonthsEMIProcessingFees = ($orderTotal * $threeMonthsTax) / 100;
         $serviceTax3Months = ($threeMonthsEMIProcessingFees * $serviceTax) / 100;
         $totalThreeMonthsAmount = $threeMonthsEMIProcessingFees + $serviceTax3Months + $orderTotal;
+
         $ThreeMonthsWorkingKey = Configuration::updateValue('WORKING_KEY_EMI_3_MONTHS'); //put in the 32 bit alphanumeric key in the quotes provided here.Please note that get this key login to your
-        $threemonthsChecksum = getChecksum($merchantid3month, $Order_Id, round($totalThreeMonthsAmount, 1), $Redirect_Url, $ThreeMonthsWorkingKey);
+        $threemonthsChecksum = getChecksum($merchantid3month, $Order_Id, round($totalThreeMonthsAmount,2), $Redirect_Url, $ThreeMonthsWorkingKey);
 
         //end details to be send to 3 months EMI screen
 
         //start making details for 6 months EMI screen
         $merchantid6month = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_6');
-        $Order_Id = 'ccAvenue_' . (int)$this->context->cart->id;
+        $Order_Id = 'EMI_' . (int)$this->context->cart->id;
         $sixMonthsEMIProcessingFees = ($orderTotal * $sixMonthsTax) / 100;
         $serviceTax6Months = ($sixMonthsEMIProcessingFees * $serviceTax) / 100;
         $totalSixMonthsAmount = $sixMonthsEMIProcessingFees + $serviceTax6Months + $orderTotal;
         $sixMonthsWorkingKey = Configuration::updateValue('WORKING_KEY_EMI_6_MONTHS'); //put in the 32 bit alphanumeric key in the quotes provided here.Please note that get this key login to your
-        $sixmonthsChecksum = getChecksum($merchantid6month, $Order_Id, round($totalSixMonthsAmount, 1), $Redirect_Url, $sixMonthsWorkingKey);
+        $sixmonthsChecksum = getChecksum($merchantid6month, $Order_Id, round($totalSixMonthsAmount,2), $Redirect_Url, $sixMonthsWorkingKey);
         //end details to be send to 6 months EMI Screen
 
         $billing = new Address($this->context->cart->id_address_invoice);
@@ -109,7 +84,7 @@ class EMIValidationModuleFrontController extends ModuleFrontController
             'ccAvenue_merchant_id_3' => $merchantid3month,
             'ccAvenue_checksum_3' => $threemonthsChecksum,
             'ccAvenue_order_id' => $Order_Id,
-            'ccAvenue_amount_3' => round($totalThreeMonthsAmount, 0),
+            'ccAvenue_amount_3' => $totalThreeMonthsAmount,
             'ccAvenue_redirect_link' => $Redirect_Url,
             'billing_cust_name' => $billing->firstname . '' . $billing->lastname,
             'billing_cust_address' => $billing->address1 . '' . $billing->address2,
@@ -120,10 +95,10 @@ class EMIValidationModuleFrontController extends ModuleFrontController
             'billing_cust_tel' => ($billing->phone) ? $billing->phone : $billing->phone_mobile,
             'billing_cust_email' => $this->context->customer->email,
             'merchant_param_3' => '3_months',
-            'processing_fee_3' => round($threeMonthsEMIProcessingFees, 1),
+            'processing_fee_3' => $threeMonthsEMIProcessingFees,
             'emi_3_processing_fee_tax' => $threeMonthsTax,
-            'serviceTax3Months' => round($serviceTax3Months, 1),
-            'emi3Amount' => round(($totalThreeMonthsAmount / 3)),
+            'serviceTax3Months' => $serviceTax3Months,
+            'emi3Amount' => ($totalThreeMonthsAmount / 3),
             'delivery_cust_name' => $delivery->firstname . '' . $delivery->lastname,
             'delivery_cust_address' => $delivery->address1 . '' . $delivery->address2,
             'delivery_cust_country' => $delivery->country,
@@ -143,10 +118,10 @@ class EMIValidationModuleFrontController extends ModuleFrontController
             'ccAvenue_checksum_6' => $sixmonthsChecksum,
             'ccAvenue_amount_6' => $totalSixMonthsAmount,
             'merchant_param_6' => '6_months',
-            'processing_fee_6' => round($sixMonthsEMIProcessingFees, 1),
+            'processing_fee_6' => $sixMonthsEMIProcessingFees,
             'emi_6_processing_fee_tax' => $sixMonthsTax,
-            'serviceTax6Months' => round($serviceTax6Months, 1),
-            'emi6Amount' => round(($totalSixMonthsAmount / 6), 1)
+            'serviceTax6Months' => $serviceTax6Months,
+            'emi6Amount' => ($totalSixMonthsAmount / 6)
         ));
 
         $this->context->smarty->assign(array(
@@ -158,5 +133,4 @@ class EMIValidationModuleFrontController extends ModuleFrontController
         $this->setTemplate('validation.tpl');
     }
 
-
-}
+    }

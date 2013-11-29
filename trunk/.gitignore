@@ -7,4 +7,5 @@
 /download*
 /log
 /log*
-
+.idea
+.idea/*

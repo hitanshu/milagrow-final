@@ -93,8 +93,6 @@ abstract class PaymentModule extends PaymentModuleCore
             CartRule::cleanCache();
             $giftWrapCounter = 1;
             foreach ($package_list as $id_address => $packageByAddress)
-
-
                 foreach ($packageByAddress as $id_package => $package) {
                     $order = new Order();
                     $order->product_list = $package['product_list'];
@@ -160,13 +158,11 @@ abstract class PaymentModule extends PaymentModuleCore
                         $order->total_paid_tax_excl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(false, Cart::BOTH, $order->product_list, $id_carrier), 2);
                         $order->total_paid_tax_incl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), 2);
                         $order->total_paid = $order->total_paid_tax_incl;
-                    }
-                    else
-                    {
+                    } else {
                         $total_wrapping_tax_excl = (float)abs($this->context->cart->getOrderTotal(false, Cart::ONLY_WRAPPING, $order->product_list, $id_carrier));
                         $total_wrapping_tax_incl = (float)abs($this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING, $order->product_list, $id_carrier));
-                        $order->total_paid_tax_excl = (float)Tools::ps_round((float)($this->context->cart->getOrderTotal(false, Cart::BOTH, $order->product_list, $id_carrier)-$total_wrapping_tax_excl), 2);
-                        $order->total_paid_tax_incl = (float)Tools::ps_round((float)($this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier)-$total_wrapping_tax_incl), 2);
+                        $order->total_paid_tax_excl = (float)Tools::ps_round((float)($this->context->cart->getOrderTotal(false, Cart::BOTH, $order->product_list, $id_carrier) - $total_wrapping_tax_excl), 2);
+                        $order->total_paid_tax_incl = (float)Tools::ps_round((float)($this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier) - $total_wrapping_tax_incl), 2);
                         $order->total_paid = $order->total_paid_tax_incl;
                     }
 
@@ -187,9 +183,19 @@ abstract class PaymentModule extends PaymentModuleCore
                     // We don't use the following condition to avoid the float precision issues : http://www.php.net/manual/en/language.types.float.php
                     // if ($order->total_paid != $order->total_paid_real)
                     // We use number_format in order to compare two string
-                    if ($order_status->logable && number_format($cart_total_paid, 2) != number_format($amount_paid, 2))
-                        $id_order_state = Configuration::get('PS_OS_ERROR');
 
+                    //if payment method is EMI than add processing fee to cart order total and then compare it
+                    //with total amount paid by the user so that the order state not be error
+                    if ($payment_method == 'EMI') {
+                        if (!empty($this->context->cookie->emi)) {
+                            $EMIAmount = $this->context->cookie->emi;
+                            if ($order_status->logable && number_format(($cart_total_paid + $EMIAmount), 2) != number_format($amount_paid, 2))
+                                $id_order_state = Configuration::get('PS_OS_ERROR');
+                        }
+                    } else {
+                        if ($order_status->logable && number_format($cart_total_paid, 2) != number_format($amount_paid, 2))
+                            $id_order_state = Configuration::get('PS_OS_ERROR');
+                    }
                     $order_list[] = $order;
 
                     // Insert new Order detail list using cart for the current order
@@ -223,8 +229,7 @@ abstract class PaymentModule extends PaymentModuleCore
                     $transaction_id = $extra_vars['transaction_id'];
                 else
                     $transaction_id = null;
-                if($payment_method != 'COD')
-                {
+                if ($payment_method != 'COD' && $payment_method!='EMI') {
                     if (!$order->addOrderPayment($amount_paid, null, $transaction_id))
                         throw new PrestaShopException('Can\'t save Order Payment');
                 }
@@ -457,7 +462,7 @@ abstract class PaymentModule extends PaymentModuleCore
                     $order = new Order($order->id);
 
                     // Send an e-mail to customer (one order = one email)
-                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id && $payment_method != 'COD') {
+                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id && $payment_method != 'COD' && $payment_method != 'EMI') {
                         $invoice = new Address($order->id_address_invoice);
                         $delivery = new Address($order->id_address_delivery);
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;

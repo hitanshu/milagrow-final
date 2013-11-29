@@ -6,16 +6,92 @@
  * Time: 12:58 PM
  * To change this template use File | Settings | File Templates.
  */
-define('_WORKING_KEY', 'f6srdljv9krmyof389tjdixf86bgmc55');
-define('_CCAVENUE_COD_SUCCESS', 'Thank you placing the order, %s of amount Rs. %s. Your order is being processed. Please check your email for additional details.');
-class CodPaymentNotificationModuleFrontController extends ModuleFrontController
+define('_CCAVENUE_EMI_SUCCESS', 'Thank you placing the order, %s of amount Rs. %s. Your order is being processed. Please check your email for additional details.');
+class EMIPaymentNotificationModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
 
+//    public function postProcess()
+//    {
+//        $card_expiration = '';
+//        $card_holder = '';
+//        $MerchantId = isset($_REQUEST["Merchant_Id"]) ? $_REQUEST["Merchant_Id"] : '';
+//        $OrderId = isset($_REQUEST["Order_Id"]) ? $_REQUEST["Order_Id"] : '';
+//        $Amount = isset($_REQUEST["Amount"]) ? $_REQUEST["Amount"] : '';
+//        $AuthDesc = isset($_REQUEST["AuthDesc"]) ? $_REQUEST["AuthDesc"] : '';
+//        $avnChecksum = isset($_REQUEST["Checksum"]) ? $_REQUEST["Checksum"] : '';
+//        $nb_order_no = isset($_REQUEST["nb_order_no"]) ? $_REQUEST['nb_order_no'] : '';
+//        if (empty($MerchantId) || empty($OrderId) || empty($Amount) || empty($AuthDesc) || empty($avnChecksum) || empty($nb_order_no))
+//            $this->setTemplate('illegal_access.tpl');
+//        else {
+//            //as we are not getting card number from ccavenue we are using this field for storing whether emi 3 months used or 6 months used
+//            $card_number = isset($_REQUEST["Merchant_Param"]) ? $_REQUEST["Merchant_Param"] : '';
+//            //and card holder is used to store percentage of EMI processing fee
+//            if ($card_number == '3_months') {
+//                $card_holder = Configuration::get('EMI_CCAVENUE_3_MONTHS_TAX');
+//                $workingKey = Configuration::get('WORKING_KEY_EMI_3_MONTHS');
+//                $merchantIdUsed = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_3');
+//            } elseif ($card_number == '6_months') {
+//                $card_holder = Configuration::get('EMI_CCAVENUE_6_MONTHS_TAX');
+//                $merchantIdUsed = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_6');
+//                $workingKey = Configuration::get('WORKING_KEY_EMI_6_MONTHS');
+//            }
+//
+//            $Checksum = verifyChecksum($merchantIdUsed, $OrderId, $Amount, $AuthDesc, $workingKey, $avnChecksum);
+//            $billing_cust_name = isset($_REQUEST["billing_cust_name"]) ? $_REQUEST["billing_cust_name"] : '';
+//            $billing_cust_address = isset($_REQUEST["billing_cust_address"]) ? $_REQUEST["billing_cust_address"] : '';
+//            $billing_cust_state = isset($_REQUEST["billing_cust_state"]) ? $_REQUEST["billing_cust_state"] : '';
+//            $billing_cust_city = isset($_REQUEST["billing_cust_city"]) ? $_REQUEST["billing_cust_city"] : '';
+//            $billing_zip_code = isset($_REQUEST["billing_zip_code"]) ? $_REQUEST["billing_zip_code"] : '';
+//            $billing_cust_country = isset($_REQUEST["billing_cust_country"]) ? $_REQUEST["billing_cust_country"] : '';
+//            $billing_cust_tel = isset($_REQUEST["billing_cust_tel"]) ? $_REQUEST['billing_cust_tel'] : '';
+//            $billing_cust_email = isset($_REQUEST["billing_cust_email"]) ? $_REQUEST["billing_cust_email"] : '';
+//
+//            $card_category = isset($_REQUEST["card_category"]) ? $_REQUEST["card_category"] : '';
+//            $cart_id = (int)str_replace('ccAvenue_', '', $OrderId);
+//            $cart = new Cart($cart_id);
+//            $emi = new EMI();
+//            $extraVars = array('transaction_id' => $nb_order_no);
+//            if ($Checksum && $AuthDesc === "Y") {
+//                $emi->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_PAYMENT'), (float)$Amount, 'EMI', 'Your credit card has been charged and the transaction is successful', $extraVars, null, false, $cart->secure_key);
+//                //finding order for EMI
+//                $orders = $this->getAllOrdersForGivenCart((int)$cart->id);
+//                if (!empty($orders)) {
+//                    $orderReference = $orders[0]['reference'];
+//                }
+//                $existing_id_currency = 1;
+//                $existing_conversion_rate = 1.0000000;
+//                Db::getInstance()->insert('order_payment', array(
+//                    'id_currency' => (int)$existing_id_currency,
+//                    'amount' => $Amount,
+//                    'payment_method' => pSQL('emi'),
+//                    'conversion_rate' => $existing_conversion_rate,
+//                    'transaction_id' => $nb_order_no,
+//                    'card_number' => $card_number,
+//                    'card_brand' => $card_category,
+//                    'card_expiration' => $card_expiration,
+//                    'card_holder' => $card_holder,
+//                    'date_add' => date('Y-m-d H:i:s'),
+//                    'order_reference' => $orderReference
+//                ));
+//                $last_insert_payment_id = Db::getInstance()->insert_id();
+//                foreach ($orders as $orderRow) {
+//                    Db::getInstance()->insert('order_invoice_payment', array(
+//                        'id_order_invoice' => (int)$orderRow['invoice_number'],
+//                        'id_order_payment' => (int)($last_insert_payment_id),
+//                        'id_order' => (int)($orderRow['id_order']),
+//                    ));
+//                }
+//            } elseif ($Checksum && $AuthDesc === "B") {
+//                $emi->validateOrder((int)$cart->id, (int)Configuration::get('CCAVENUE_EMI_PENDING_STATUS'), (float)$Amount, 'EMI', 'The transaction is in pending verification', $extraVars, null, false, $cart->secure_key);
+//            } elseif ($Checksum && $AuthDesc === "N") {
+//                $emi->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_ERROR'), (float)$Amount, 'EMI', 'The transaction has been declined', $extraVars, null, false, $cart->secure_key);
+//            }
+//        }
+//    }
+
     public function postProcess()
     {
-        $WorkingKey = _WORKING_KEY; //put in the 32 bit working key in the quotes provided here
-        $card_number = '';
         $card_expiration = '';
         $card_holder = '';
         $MerchantId = isset($_REQUEST["Merchant_Id"]) ? $_REQUEST["Merchant_Id"] : '';
@@ -24,10 +100,21 @@ class CodPaymentNotificationModuleFrontController extends ModuleFrontController
         $AuthDesc = isset($_REQUEST["AuthDesc"]) ? $_REQUEST["AuthDesc"] : '';
         $avnChecksum = isset($_REQUEST["Checksum"]) ? $_REQUEST["Checksum"] : '';
         $nb_order_no = isset($_REQUEST["nb_order_no"]) ? $_REQUEST['nb_order_no'] : '';
-        if (empty($MerchantId) || empty($OrderId) || empty($Amount) || empty($AuthDesc) || empty($avnChecksum) || empty($nb_order_no))
-            $this->setTemplate('illegal_access.tpl');
-        else {
-            $Checksum = verifyChecksum($MerchantId, $OrderId, $Amount, $AuthDesc, $WorkingKey, $avnChecksum);
+
+            //as we are not getting card number from ccavenue we are using this field for storing whether emi 3 months used or 6 months used
+            $card_number = isset($_REQUEST["Merchant_Param"]) ? $_REQUEST["Merchant_Param"] : '';
+            //and card holder is used to store percentage of EMI processing fee
+            if ($card_number == '3_months') {
+                $card_holder = Configuration::get('EMI_CCAVENUE_3_MONTHS_TAX');
+                $workingKey = Configuration::get('WORKING_KEY_EMI_3_MONTHS');
+                $merchantIdUsed = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_3');
+            } elseif ($card_number == '6_months') {
+                $card_holder = Configuration::get('EMI_CCAVENUE_6_MONTHS_TAX');
+                $merchantIdUsed = Configuration::get('_MERCHANT_ID_EMI_CCAVENUE_6');
+                $workingKey = Configuration::get('WORKING_KEY_EMI_6_MONTHS');
+            }
+
+            $Checksum = verifyChecksum($merchantIdUsed, $OrderId, $Amount, $AuthDesc, $workingKey, $avnChecksum);
             $billing_cust_name = isset($_REQUEST["billing_cust_name"]) ? $_REQUEST["billing_cust_name"] : '';
             $billing_cust_address = isset($_REQUEST["billing_cust_address"]) ? $_REQUEST["billing_cust_address"] : '';
             $billing_cust_state = isset($_REQUEST["billing_cust_state"]) ? $_REQUEST["billing_cust_state"] : '';
@@ -36,101 +123,48 @@ class CodPaymentNotificationModuleFrontController extends ModuleFrontController
             $billing_cust_country = isset($_REQUEST["billing_cust_country"]) ? $_REQUEST["billing_cust_country"] : '';
             $billing_cust_tel = isset($_REQUEST["billing_cust_tel"]) ? $_REQUEST['billing_cust_tel'] : '';
             $billing_cust_email = isset($_REQUEST["billing_cust_email"]) ? $_REQUEST["billing_cust_email"] : '';
-            $Merchant_Param = isset($_REQUEST["Merchant_Param"]) ? $_REQUEST["Merchant_Param"] : '';
 
             $card_category = isset($_REQUEST["card_category"]) ? $_REQUEST["card_category"] : '';
+            $cart_id = (int)str_replace('ccAvenue_', '', $OrderId);
+            $cart = new Cart($cart_id);
+            $emi = new EMI();
+            $extraVars = array('transaction_id' => $nb_order_no);
 
-            if ($Checksum && $AuthDesc === "Y") {
-
-                // Getting payment row already exist from order reference number
-                try {
-                    $sql = 'SELECT * from ' . _DB_PREFIX_ . 'order_payment WHERE order_reference=\'' . $OrderId . '\'';
-                    if ($row = Db::getInstance()->getRow($sql)) {
-                        $existing_id_order_payment = $row['id_order_payment'];
-                        $existing_id_currency = $row['id_currency'];
-                        $existing_conversion_rate = $row['conversion_rate'];
-
-                        Db::getInstance()->insert('order_payment', array(
-                            'id_currency' => (int)$existing_id_currency,
-                            'amount' => $Amount,
-                            'payment_method' => pSQL('ccavenue'),
-                            'conversion_rate' => $existing_conversion_rate,
-                            'transaction_id' => $nb_order_no,
-                            'card_number' => $card_number,
-                            'card_brand' => $card_category,
-                            'card_expiration' => $card_expiration,
-                            'card_holder' => $card_holder,
-                            'date_add' => date('Y-m-d H:i:s'),
-                            'order_reference' => $OrderId
-                        ));
-
-                        $last_insert_payment_id = Db::getInstance()->insert_id();
-                        $query = 'SELECT * from ' . _DB_PREFIX_ . 'order_invoice_payment where id_order_payment=' . $existing_id_order_payment;
-                        if ($row = Db::getInstance()->getRow($query)) {
-                            $existing_id_order_invoice = $row['id_order_invoice'];
-                            $existing_id_order = $row['id_order'];
-                            Db::getInstance()->insert('order_invoice_payment', array(
-                                'id_order_invoice' => (int)$existing_id_order_invoice,
-                                'id_order_payment' => (int)($last_insert_payment_id),
-                                'id_order' => (int)($existing_id_order),
-                            ));
-                        }
-
-                        //sending success message to customer
-                        $sql = 'SELECT ' . _DB_PREFIX_ . 'orders.reference,' . _DB_PREFIX_ . 'address.phone_mobile,total_paid_tax_incl as amount FROM ' . _DB_PREFIX_ . 'orders join ' . _DB_PREFIX_ . 'customer on ' . _DB_PREFIX_ . 'orders.id_customer=' . _DB_PREFIX_ . 'customer.id_customer join ' . _DB_PREFIX_ . 'address on ' . _DB_PREFIX_ . 'orders.id_address_delivery=' . _DB_PREFIX_ . 'address.id_address WHERE ' . _DB_PREFIX_ . 'orders.reference=\'' . $OrderId . '\'';
-                        if ($row = Db::getInstance()->getRow($sql)) {
-                            $this->sendMessage($OrderId, $Amount, $row['phone_mobile']);
-                        }
-                        $billingAddress = array('firstname' => $billing_cust_name, 'lastname' => '', 'state' => $billing_cust_state, 'phone' => $billing_cust_tel, 'postcode' => $billing_zip_code, 'city' => $billing_cust_city, 'address1' => $billing_cust_address, 'address2' => '', 'country' => $billing_cust_country);
-                        $this->sendEmailToCustomer($billingAddress, $OrderId, $existing_id_order, $Amount);
-                        $this->context->smarty->assign(array(
-                            'txn_id' => $$nb_order_no,
-                        ));
-                        $this->setTemplate('success.tpl');
-                    }
-                } catch (Exception $e) {
-                    throw new PrestaShopExceptionCore();
+                $this->validateEMIOrder((int)$cart->id, (int)Configuration::get('PS_OS_PAYMENT'), (float)$Amount,'EMI', 'Your credit card has been charged and the transaction is successful', $extraVars, null, false, $cart->secure_key);
+                //finding order for EMI
+                $orders = $this->getAllOrdersForGivenCart((int)$cart->id);
+                if (!empty($orders)) {
+                    $orderReference = $orders[0]['reference'];
                 }
-
-            } else if ($Checksum && $AuthDesc === "B") {
-                $new_history = new OrderHistory();
-                $order_id = $this->getOrderIdFromReference($OrderId);
-                if ($order_id) {
-                    $new_history->id_order = (int)$order_id;
-                    $new_history->changeIdOrderState(Configuration::get('PS_OS_ERROR'), $order_id, true);
+                $existing_id_currency = 1;
+                $existing_conversion_rate = 1.0000000;
+                Db::getInstance()->insert('order_payment', array(
+                    'id_currency' => (int)$existing_id_currency,
+                    'amount' => $Amount,
+                    'payment_method' => pSQL('emi'),
+                    'conversion_rate' => $existing_conversion_rate,
+                    'transaction_id' => $nb_order_no,
+                    'card_number' => $card_number,
+                    'card_brand' => $card_category,
+                    'card_expiration' => $card_expiration,
+                    'card_holder' => $card_holder,
+                    'date_add' => date('Y-m-d H:i:s'),
+                    'order_reference' => $orderReference
+                ));
+                $last_insert_payment_id = Db::getInstance()->insert_id();
+                foreach ($orders as $orderRow) {
+                    Db::getInstance()->insert('order_invoice_payment', array(
+                        'id_order_invoice' => (int)$orderRow['invoice_number'],
+                        'id_order_payment' => (int)($last_insert_payment_id),
+                        'id_order' => (int)($orderRow['id_order']),
+                    ));
                 }
+//            } elseif ($Checksum && $AuthDesc === "B") {
+//                $emi->validateOrder((int)$cart->id, (int)Configuration::get('CCAVENUE_EMI_PENDING_STATUS'), (float)$Amount, $this->displayName, $this->l('The transaction is in pending verification'), $extraVars, null, false, $cart->secure_key);
+//            } elseif ($Checksum && $AuthDesc === "N") {
+//                $emi->validateOrder((int)$cart->id, (int)Configuration::get('PS_OS_ERROR'), (float)$Amount, $this->displayName, $this->l('The transaction has been declined'), $extraVars, null, false, $cart->secure_key);
+//            }
 
-                $this->setTemplate('error.tpl');
-
-
-                //Here you need to put in the routines/e-mail for a  "Batch Processing" order
-                //This is only if payment for this transaction has been made by an American Express Card or by any netbank and status is not known is real time  the authorisation status will be  available only after 5-6 hours  at the "View Pending Orders" or you may do an order status query to fetch the status . Refer inetegrtaion document for order status tracker documentation"
-            } else if ($Checksum && $AuthDesc === "N") {
-                $new_history = new OrderHistory();
-                $order_id = $this->getOrderIdFromReference($OrderId);
-                if ($order_id) {
-                    $new_history->id_order = (int)$order_id;
-                    $new_history->changeIdOrderState(Configuration::get('PS_OS_ERROR'), $order_id, true);
-                }
-
-                $this->setTemplate('error.tpl');
-                //Here you need to put in the routines for a failed
-                //transaction such as sending an email to customer
-                //setting database status etc etc
-            } else {
-
-//    Tools::redirect('index.php?controller=my-account');
-                //Here you need to check for the checksum, the checksum did not match hence the error.
-                $new_history = new OrderHistory();
-                $order_id = $this->getOrderIdFromReference($OrderId);
-                if ($order_id) {
-                    $new_history->id_order = (int)$order_id;
-                    $new_history->changeIdOrderState(Configuration::get('PS_OS_ERROR'), $order_id, true);
-                }
-                $this->setTemplate('error.tpl');
-            }
-
-        }
     }
 
     function sendMessage($orderReference, $amount, $mobile)
@@ -160,7 +194,8 @@ class CodPaymentNotificationModuleFrontController extends ModuleFrontController
 
     }
 
-    private function sendEmailToCustomer($billingAddress, $orderReference, $orderId, $amount)
+    private
+    function sendEmailToCustomer($billingAddress, $orderReference, $orderId, $amount)
     {
         $order = new Order($orderId);
         $products_list = '';
@@ -303,7 +338,8 @@ class CodPaymentNotificationModuleFrontController extends ModuleFrontController
 
     }
 
-    private function getFormattedDeliveryAddress($address, $html = true)
+    private
+    function getFormattedDeliveryAddress($address, $html = true)
     {
         if ($html) {
             return '<strong>' . $address->firstname . '' . $address->lastname . '</strong><br/>' . $address->address1 .
@@ -315,7 +351,8 @@ class CodPaymentNotificationModuleFrontController extends ModuleFrontController
             '\r\n' . $address->address2 . '\r\n' . $address->city . ',' . $address->state . '\r\n' . $address->country . '\r\n' . $address->postcode;
     }
 
-    private function getFormattedBillingAddress($address, $html = true)
+    private
+    function getFormattedBillingAddress($address, $html = true)
     {
 
         if ($html) {
@@ -328,13 +365,24 @@ class CodPaymentNotificationModuleFrontController extends ModuleFrontController
             '\r\n' . $address['address2'] . '\r\n' . $address['city'] . ',' . $address['state'] . '\r\n' . $address['country'] . '\r\n' . $address['postcode'];
     }
 
-    private function getOrderIdFromReference($referenceNumber)
+    private
+    function getOrderIdFromReference($referenceNumber)
     {
         $sql = 'Select * from ' . _DB_PREFIX_ . 'orders where reference=\'' . $referenceNumber . '\'';
         if ($row = Db::getInstance()->getRow($sql)) {
             return $row['id_order'];
         }
         return false;
+    }
+
+    public
+    function getAllOrdersForGivenCart($cartId)
+    {
+        $sqlQuery = 'Select * from ' . _DB_PREFIX_ . 'orders where id_cart=' . $cartId;
+        $result = Db::getInstance()->executeS($sqlQuery);
+        if ($result)
+            return $result;
+        return array();
     }
 
 }

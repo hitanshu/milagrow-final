@@ -1,24 +1,24 @@
 <?php
 
 
-	function verifyChecksum($MerchantId , $OrderId, $Amount, $AuthDesc, $WorkingKey,  $CheckSum)
+	function verifyChecksumEMI($MerchantId , $OrderId, $Amount, $AuthDesc, $WorkingKey,  $CheckSum)
 	{	
 		$str = "";
 		$str = "$MerchantId|$OrderId|$Amount|$AuthDesc|$WorkingKey";
 		$adler = 1;
-		$adler = adler32($adler,$str);
+		$adler = adler32EMI($adler,$str);
 		if($adler==$CheckSum) return true;
 		else return false;		
 	}
 
-	function getChecksum($MerchantId, $OrderId, $Amount, $redirectUrl, $WorkingKey)  {
+	function getChecksumEMI($MerchantId, $OrderId, $Amount, $redirectUrl, $WorkingKey)  {
 		$str = "$MerchantId|$OrderId|$Amount|$redirectUrl|$WorkingKey";
 		$adler = 1;
-		$adler = adler32($adler,$str);
+		$adler = adler32EMI($adler,$str);
 		return $adler;
 	}
 
-	function adler32($adler , $str)
+	function adler32EMI($adler , $str)
 	{
 		$BASE =  65521 ;
 
@@ -29,10 +29,10 @@
 			$s1 = ($s1 + Ord($str[$i])) % $BASE ;
 			$s2 = ($s2 + $s1) % $BASE ;
 		}
-		return leftshift($s2 , 16) + $s1;
+		return leftshiftEMI($s2 , 16) + $s1;
 	}
 
-	function leftshift($str , $num)
+	function leftshiftEMI($str , $num)
 	{
 
 		$str = DecBin($str);
@@ -46,10 +46,10 @@
 			$str = substr($str , 1 ) ;
 			//echo "str : $str <BR>";
 		}
-		return cdec($str) ;
+		return cdecEMI($str) ;
 	}
 
-	function cdec($num)
+	function cdecEMI($num)
 	{
 		$dec=0;
 		for ($n = 0 ; $n < strlen($num) ; $n++)

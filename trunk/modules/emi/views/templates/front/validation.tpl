@@ -45,7 +45,7 @@
                 <form action="https://www.ccavenue.com/shopzone/cc_details.jsp" method="post" id="ccAvenue_payment_form"
                       class="payment_module">
                     <input type=hidden name=Merchant_Id value="{$ccAvenue_merchant_id_3}">
-                    <input type=hidden name=Amount value="{$ccAvenue_amount_3}">
+                    <input type=hidden name=Amount value="{round($ccAvenue_amount_3,2)}">
                     <input type=hidden name=Order_Id value="{$ccAvenue_order_id}">
                     <input type=hidden name=Redirect_Url value="{$ccAvenue_redirect_link}">
                     <input type=hidden name=Checksum value="{$ccAvenue_checksum_3}">
@@ -66,6 +66,7 @@
                     <input type=hidden name=delivery_zip_code value="{$delivery_zip}">
                     <input type=hidden name=delivery_cust_tel value="{$delivery_cust_tel}">
                     <input type=hidden name=delivery_cust_email value="{$delivery_cust_email}">
+                    <input type=hidden name=Merchant_Param value="{$merchant_param_3}">
 
                     <input type="submit" value="PAY NOW" name="submit" class="exclusive_large">
                 </form>
@@ -110,13 +111,7 @@
                           class="price">{convertPrice price=$ccAvenue_amount_3}</span>
                     </span></td>
             </tr>
-            <tr>
-                <td>EMI Per Month</td>
-                <td><span id="amount_{$currencies.0.id_currency}"
-                          class="price">{convertPrice price=$emi3Amount}</span>
-                    </span>
-                </td>
-            </tr>
+
             </tbody>
 
         </table>
@@ -130,7 +125,7 @@
             <form action="https://www.ccavenue.com/shopzone/cc_details.jsp" method="post" id="ccAvenue_payment_form"
                   class="payment_module">
                 <input type=hidden name=Merchant_Id value="{$ccAvenue_merchant_id_6}">
-                <input type=hidden name=Amount value="{$ccAvenue_amount_6}">
+                <input type=hidden name=Amount value="{round($ccAvenue_amount_6,2)}">
                 <input type=hidden name=Order_Id value="{$ccAvenue_order_id}">
                 <input type=hidden name=Redirect_Url value="{$ccAvenue_redirect_link}">
                 <input type=hidden name=Checksum value="{$ccAvenue_checksum_6}">
@@ -150,6 +145,7 @@
                 <input type=hidden name=delivery_zip_code value="{$delivery_zip}">
                 <input type=hidden name=delivery_cust_tel value="{$delivery_cust_tel}">
                 <input type=hidden name=delivery_cust_email value="{$delivery_cust_email}">
+                <input type=hidden name=Merchant_Param value="{$merchant_param_6}">
 
                 <input type="submit" value="PAY NOW" name="submit" class="exclusive_large">
             </form>
@@ -192,13 +188,6 @@
                 <td><span id="amount_{$currencies.0.id_currency}"
                           class="price">{convertPrice price=$ccAvenue_amount_6}</span>
                     </span></td>
-            </tr>
-            <tr>
-                <td>EMI Per Month</td>
-                <td><span id="amount_{$currencies.0.id_currency}"
-                          class="price">{convertPrice price=$emi6Amount}</span>
-                    </span>
-                </td>
             </tr>
 
 

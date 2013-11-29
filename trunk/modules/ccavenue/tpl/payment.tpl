@@ -2,7 +2,7 @@
     <div class="payment-text-block">
         <span>Credit Cards / Debit Cards / Net Banking / Cash Cards / Mobile Payments </span><br><span
                 class="payment-description">
-        Lorem Ipsum dsdff
+        You may use any of the above options to make a payment.
         </span>
     </div>
     <div class="payment-button-block">

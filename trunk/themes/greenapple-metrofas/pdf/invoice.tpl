@@ -301,31 +301,65 @@
     {if ($order_invoice->total_paid_tax_incl - $order_invoice->total_paid_tax_excl) > 0}
         <tr style="line-height:5px;">
             <td style="text-align: right; font-weight: bold">{l s='Total Tax' pdf='true'}</td>
-            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=($order_invoice->total_paid_tax_incl - $order_invoice->total_products)}</td>
+            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=($order_invoice->total_paid_tax_incl - $order_invoice->total_paid_tax_excl)}</td>
         </tr>
     {/if}
-    {assign var=down_payment value=0}
-    <tr style="line-height:5px;">
-        <td style="text-align: right; font-weight: bold">{l s='Total' pdf='true'}</td>
-        <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=($order_invoice->total_paid_tax_incl-$down_payment)}</td>
-    </tr>
-    {foreach from=$order_invoice->getOrderPaymentCollection() item=payment}
-    {*{$payment}*}
-        {if ($payment->payment_method=="ccavenue")}
-            {$down_payment=$down_payment+$payment->amount}
-            <tr style="line-height:5px;">
-                <td style="text-align: right; font-weight: bold">{l s='Payment received for COD (Cash On Delivery) @ CCAVENUE' pdf='true'}</td>
-                <td style="width: 15%; text-align: right;">-{displayPrice price=$payment->amount currency=$order->id_currency}</td>
-            </tr>
-        {/if}
-    {/foreach}
-    {if $down_payment>0}
+
+    {if $order->payment eq 'COD' || $order->payment eq 'cod'}
+        {assign var=down_payment value=0}
         <tr style="line-height:5px;">
-            <td style="text-align: right; font-weight: bold">{l s='Balance Due From Customer
-        ' pdf='true'}</td>
+            <td style="text-align: right; font-weight: bold">{l s='Total' pdf='true'}</td>
             <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=($order_invoice->total_paid_tax_incl-$down_payment)}</td>
         </tr>
+        {foreach from=$order_invoice->getOrderPaymentCollection() item=payment}
+
+
+            {if ($payment->payment_method=="ccavenue")}
+                {$down_payment=$down_payment+$payment->amount}
+                <tr style="line-height:5px;">
+                    <td style="text-align: right; font-weight: bold">{l s='Payment received for COD (Cash On Delivery) @ CCAVENUE' pdf='true'}</td>
+                    <td style="width: 15%; text-align: right;">
+                        -{displayPrice price=$payment->amount currency=$order->id_currency}</td>
+                </tr>
+            {/if}
+        {/foreach}
+        {if $down_payment>0}
+            <tr style="line-height:5px;">
+                <td style="text-align: right; font-weight: bold">{l s='Balance Due From Customer
+        ' pdf='true'}</td>
+                <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=($order_invoice->total_paid_tax_incl-$down_payment)}</td>
+            </tr>
+        {/if}
+
+    {elseif $order->payment eq 'EMI' || $order->payment eq 'emi'}
+        <tr style="line-height:5px;">
+            <td style="text-align: right; font-weight: bold">{l s='Total Order' pdf='true'}</td>
+            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=$order_invoice->total_paid_tax_incl}</td>
+        </tr>
+        {foreach from=$order_invoice->getOrderPaymentCollection() item=payment}
+            {assign var=EMI_TAX_RATE value=$payment->card_holder}
+        {/foreach}
+        <tr style="line-height:5px;">
+            <td style="text-align: right; font-weight: bold">EMI File Charge ({$EMI_TAX_RATE}%)</td>
+            {assign var=EMI_PROCESSING_FEES value=(($order_invoice->total_paid_tax_incl*$EMI_TAX_RATE)/100)}
+            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=$EMI_PROCESSING_FEES}</td>
+        </tr>
+        <tr style="line-height:5px;">
+            <td style="text-align: right; font-weight: bold">Service Tax 12.36% of {displayPrice currency=$order->id_currency price=$EMI_PROCESSING_FEES}</td>
+            {assign var=EMI_SERVICE_CHARGE_FEES value=(($EMI_PROCESSING_FEES*12.36)/100)}
+            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=$EMI_SERVICE_CHARGE_FEES}</td>
+        </tr>
+        <tr style="line-height:5px;">
+            <td style="text-align: right; font-weight: bold">{l s='Total' pdf='true'}</td>
+            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=($order_invoice->total_paid_tax_incl+$EMI_PROCESSING_FEES+$EMI_SERVICE_CHARGE_FEES)}</td>
+        </tr>
+    {else}
+        <tr style="line-height:5px;">
+            <td style="text-align: right; font-weight: bold">{l s='Total' pdf='true'}</td>
+            <td style="width: 15%; text-align: right;">{displayPrice currency=$order->id_currency price=$order_invoice->total_paid_tax_incl}</td>
+        </tr>
     {/if}
+
 
 </table>
 

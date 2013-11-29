@@ -84,8 +84,8 @@
 {/if}
 
 {*{if isset($followup)}*}
-    {*<p class="bold">{l s='Click the following link to track the delivery of your order'}</p>*}
-    {*<a href="{$followup|escape:'htmlall':'UTF-8'}">{$followup|escape:'htmlall':'UTF-8'}</a>*}
+{*<p class="bold">{l s='Click the following link to track the delivery of your order'}</p>*}
+{*<a href="{$followup|escape:'htmlall':'UTF-8'}">{$followup|escape:'htmlall':'UTF-8'}</a>*}
 {*{/if}*}
 
 <div class="adresses_bloc clearfix">
@@ -185,32 +185,67 @@
                 class="price-shipping">{displayWtPriceWithCurrency price=$order->total_shipping currency=$currency}</span>
     </td>
 </tr>
-{assign var=down_payment value=0}
-{foreach from=$order_invoice item=payment}
-    {if (isset($payment['payment_method'])&& $payment['payment_method']=="ccavenue")}
-        {$down_payment=$down_payment+$payment['amount']}
-        <tr class="item">
-            <td colspan=5>{l s='Payment Received for COD(Cash on delivery @ ccanenue)' pdf='true'}<span
-                        class="price-wrapping"> {displayPrice price=$payment['amount'] currency=$order->id_currency}</span>
-            </td>
-        </tr>
-    {/if}
-{/foreach}
-{if $down_payment>0}
+{if $order->payment eq 'COD' || $order->payment eq 'cod'}
+    <tr class="totalprice item">
+        <td colspan="{if $return_allowed || $order->hasProductReturned()}{if $order->hasProductReturned() && $return_allowed}7{else}6{/if}{else}5{/if}">
+            {l s='Total'} <span
+                    class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
+        </td>
+    </tr>
+    {assign var=down_payment value=0}
+    {foreach from=$order_invoice item=payment}
+        {if (isset($payment['payment_method'])&& $payment['payment_method']=="ccavenue")}
+            {$down_payment=$down_payment+$payment['amount']}
+            <tr class="item">
+                <td colspan=5>{l s='Payment Received for COD(Cash on delivery @ ccanenue)' pdf='true'}<span
+                            class="price-wrapping"> {displayPrice price=$payment['amount'] currency=$order->id_currency}</span>
+                </td>
+            </tr>
+        {/if}
+    {/foreach}
     <tr class="totalprice item">
         <td colspan="{if $return_allowed || $order->hasProductReturned()}{if $order->hasProductReturned() && $return_allowed}7{else}6{/if}{else}5{/if}">
             {l s='Balance Due from customer '} <span
                     class="price">{displayWtPriceWithCurrency price=$order->total_paid-$down_payment currency=$currency}</span>
         </td>
     </tr>
-    {else}
+{elseif $order->payment eq 'EMI' || $order->payment eq 'emi'}
+
+    <tr class="totalprice item">
+        <td colspan="{if $return_allowed || $order->hasProductReturned()}{if $order->hasProductReturned() && $return_allowed}7{else}6{/if}{else}5{/if}">
+            {l s='Order Total:'} <span
+                    class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
+        </td>
+    </tr>
+    {foreach from=$order_invoice item=payment}
+               {assign var=EMI_TAX_RATE value=$payment['card_holder']}
+    {/foreach}
+    {assign var=EMI_PROCESSING_FEES value=(($order->total_paid*$EMI_TAX_RATE)/100)}
+    {assign var=EMI_SERVICE_CHARGE_FEES value=(($EMI_PROCESSING_FEES*12.36)/100)}
+
+    <tr class="item">
+        <td colspan=5>EMI File Charge ({$EMI_TAX_RATE}%):<span
+                    class="price-wrapping"> {displayPrice currency=$order->id_currency price=$EMI_PROCESSING_FEES}</span>
+        </td>
+    </tr>
+    <tr class="item">
+        <td colspan=5>Service Tax 12.36% of  {displayPrice currency=$order->id_currency price=$EMI_PROCESSING_FEES}:<span
+                    class="price-wrapping"> {displayPrice currency=$order->id_currency price=$EMI_SERVICE_CHARGE_FEES}</span>
+        </td>
+    </tr>
+    <tr class="item">
+        <td colspan=5>Total<span
+                    class="price-wrapping"> {displayPrice price=($order->total_paid+$EMI_PROCESSING_FEES+$EMI_SERVICE_CHARGE_FEES) currency=$order->id_currency}</span>
+        </td>
+    </tr>
+{else}
     <tr class="totalprice item">
         <td colspan="{if $return_allowed || $order->hasProductReturned()}{if $order->hasProductReturned() && $return_allowed}7{else}6{/if}{else}5{/if}">
             {l s='Total'} <span
-                    class="price">{displayWtPriceWithCurrency price=$order->total_paid-$down_payment currency=$currency}</span>
+                    class="price">{displayPrice price=$order->total_paid currency=$currency}</span>
         </td>
     </tr>
-    {/if}
+{/if}
 
 </tfoot>
 <tbody>

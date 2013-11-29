@@ -15,8 +15,7 @@
         <td>&nbsp;</td>
     </tr>
     <tr>
-        <td align="left">Hi <strong style="color: {color};">{firstname} {lastname}</strong>,<br/><br/>Thank you for
-            shopping with <strong>{shop_name}</strong>!
+        <td align="left">Hi <strong style="color: {color};">&nbsp; Administrator</strong>!
         </td>
     </tr>
     <tr>
@@ -32,7 +31,7 @@
     </tr>
     <tr>
         <td align="left">Order: <strong><span style="color: {color};">{order_name}</span> placed on {date}</strong>
-            <br/>Payment: <strong>{payment}</strong></td>
+            <br/>Payment: <strong>{payment}-{emi_plan}</strong></td>
     </tr>
     <tr>
         <td>&nbsp;</td>
@@ -54,9 +53,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="5">
-                        {discounts}
-                    </td>
+                    <td colspan="5">{discounts}</td>
                 </tr>
                 <tr style="text-align: right;">
                     <td>&nbsp;</td>
@@ -65,7 +62,7 @@
                 </tr>
                 <tr style="text-align: right;">
                     <td>&nbsp;</td>
-                    <td style="background-color: #ebecee; padding: 0.6em 0.4em;" colspan="3">Less Discounts</td>
+                    <td style="background-color: #ebecee; padding: 0.6em 0.4em;" colspan="3">Discounts</td>
                     <td style="background-color: #ebecee; padding: 0.6em 0.4em;">{total_discounts}</td>
                 </tr>
                 <tr style="text-align: right;">
@@ -78,18 +75,26 @@
                     <td style="background-color: #dde2e6; padding: 0.6em 0.4em;" colspan="3">Shipping</td>
                     <td style="background-color: #dde2e6; padding: 0.6em 0.4em;">{total_shipping}</td>
                 </tr>
+
                 <tr style="text-align: right;">
                     <td>&nbsp;</td>
-                    <td style="background-color: #dde2e6; padding: 0.6em 0.4em;" colspan="3">Less Payment received for
-                        COD (Cash On Delivery) @ CCAVENUE
+                    <td style="background-color: #dde2e6; padding: 0.6em 0.4em;" colspan="3">EMI Processing
+                        Fees({emi_tax_rate}%)
                     </td>
-                    <td style="background-color: #dde2e6; padding: 0.6em 0.4em;">{ccavenuePayment}</td>
+                    <td style="background-color: #dde2e6; padding: 0.6em 0.4em;">{emi_processing_fees}</td>
                 </tr>
-                <tr style="text-align: right; font-weight: bold;">
+
+                <tr style="text-align: right;">
                     <td>&nbsp;</td>
-                    <td style="background-color: #f1aecf; padding: 0.6em 0.4em;" colspan="3">Balance Due From Customer
+                    <td style="background-color: #dde2e6; padding: 0.6em 0.4em;" colspan="3">Service Tax 12.36% of
+                        {emi_processing_fees}
                     </td>
-                    <td style="background-color: #f1aecf; padding: 0.6em 0.4em;">{total_paid}</td>
+                    <td style="background-color: #dde2e6; padding: 0.6em 0.4em;">{service_tax_fees}</td>
+                </tr>
+                <tr style="text-align: right;font-weight: bold">
+                    <td>&nbsp;</td>
+                    <td style="background-color: #f1aecf; padding: 0.6em 0.4em;" colspan="3">Total</td>
+                    <td style="background-color: #f1aecf; padding: 0.6em 0.4em;">{total_final_paid}</td>
                 </tr>
                 </tbody>
             </table>
