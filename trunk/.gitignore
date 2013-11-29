@@ -1,8 +1,10 @@
-/cache
 /cache*
-.idea*
-.idea/*
-log/*
-log
-tabtop-upgrades/*
-tabtop-upgrades*
+/tabtop-upgrades
+/tabtop-upgrades*
+/upload
+/cache
+/download
+/download*
+/log
+/log*
+
